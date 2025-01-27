@@ -25,27 +25,15 @@ def fetch_data(url, params=None, retries=5, delay=10):
     print("Max retries reached. Failed to fetch data.")
     return None
 
-def get_all_coins(currency='usd'):
-    params = {
-        'vs_currency': currency,
+def main():
+    print("Fetching Coins...")
+    coins_data = fetch_data(COINGECKO_COINS_URL, params={
+        'vs_currency': 'usd',
         'order': 'market_cap_desc',
         'per_page': 250,  
         'page': 1,
         'sparkline': False,
-    }
-    return fetch_data(COINGECKO_COINS_URL, params=params)
-
-def get_coin_historical_data(coin_id, currency='usd', days=365):
-    url = COINGECKO_HISTORICAL_URL.format(id=coin_id)
-    params = {
-        'vs_currency': currency,
-        'days': days,  
-    }
-    return fetch_data(url, params=params)
-
-def main():
-    print("Fetching list of all coins...")
-    coins_data = get_all_coins()
+    })
 
     if not coins_data:
         print("Failed to fetch coins data.")
@@ -58,7 +46,10 @@ def main():
         coin_name = coin['name']
         print(f"Fetching historical data for {coin_name} ({coin_id})...")
 
-        historical_data = get_coin_historical_data(coin_id, days=365)
+        historical_data = fetch_data(COINGECKO_HISTORICAL_URL.format(id=coin_id), params={
+            'vs_currency': 'usd',
+            'days': 365,  
+        })
 
         if historical_data:
             prices = historical_data.get('prices', [])
